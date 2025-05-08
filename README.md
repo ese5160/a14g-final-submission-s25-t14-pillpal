@@ -9,6 +9,8 @@
 
 ## 1. Video Presentation
 
+https://youtu.be/ZBLSTaz6bz8
+
 ## 2. Project Summary
 ### Device Description  
 #### What is our device?   
@@ -92,13 +94,63 @@ Throughout the ESE5160 course, we gained practical and theoretical skills essent
 **Link to PCBA:** https://upenn-eselabs.365.altium.com/designs/8B70E409-2835-43B1-999B-2FA11EA3B7DD#design
 
 
-## 3. Hardware & Software Requirements
+## 3. Hardware & Software Requirements  
+### Hardware Requirements Validation
+
+| ID       | Requirement Description                                                                 | Status       | Validation Method                                                                 |
+|----------|------------------------------------------------------------------------------------------|--------------|-----------------------------------------------------------------------------------|
+| HR 01    | Project uses the SAMW25 microcontroller module                                           |  Met        | Verified via firmware check / chip ID.                                            |
+| HR 02    | An RFID reader shall be used for access control. The reader shall authenticate RFID tags at a maximum distance of 5 cm and communicate with the microcontroller via I2C.                                           |  Partially Met | Range tested with ruler. Communication verified via I2C ACK/NACK and tag UID.    |
+|HR 03 | If the RFID tag matches the reader, the main compartment shall open, which is controlled by a servo motor. | Met | The servo opens and closes the slot for inputting the pills.
+| HR 04    | The pill will be dispensed using a carousel design. A rotating disc is aligned with a dispensing chute. The disc rotates using a stepper motor to position the correct slot over the chute at the scheduled time.   | Met   | Tic-Tac placed for experimenting is dispensed.             |
+| HR 05    | The device shall include a buzzer for audio notifications. The buzzer shall produce a sound output of at least dB at ? cm and shall be activated for dose alerts.                                                       |  Partially Met | Buzzer tested. dB output needs measurement at 10 cm using phone dB meter.        |
+| HR 06    | A Lithium Ion Cylindrical Battery - 3.7V, 2200mAh shall be used as the power source. The battery shall be parallely connected to a Boost Convert (6V) and a Buck Converter (3.3V).                                   |  Partially Met        | Multimeter used to verify 3.3V rail. Performed e-load testing as well. Boost converter however does not work due to DRC errors in the PCB design. Used an external 5V DC supply.                                     |
+| HR 07    | The enclosure and carousel dispensing mechanism should be 3D printed.            |  Met        | Measured dimensions. Lid and mechanism assembled as per spec.                    |
+| HR 08    | The pill dispenser shall use 802.11 b/g/n Wi-Fi for communication with cloud services.                                      |  Met        | Verified MQTT communication with Node-RED via serial logs.                       |
+| HR 09    |  An LED shall indicate dose alerts.                                             |  Met        | LEDs trigger on stepper motor turning battery logic.                                  |
+| HR 10    | A load cell/force sensor should be placed at the end of the dispenser to check if the patient picks up the pill                                                   |  Not Met | Was not a mandatory requirement.                      |
+
+### Software Requirements Validation  
+## Software Requirements Validation
+
+| ID       | Requirement Description                                                                 | Status       | Validation Method                                                                 |
+|----------|------------------------------------------------------------------------------------------|--------------|-----------------------------------------------------------------------------------|
+| SRS 01   | A notification shall be sent to the patient when they need to take their medication on Node-RED.                                        |  Met        | Verified on Node-RED task.                                      |
+| SRS 02   | A reminder notification shall be sent in 5 minutes if the patient has not taken their medication.                                 | Not Met        | Future scope |
+| SRS 03   | A counter shall keep track of the number of pills left in the dispenser and alert the patient. The counter subtracts the pill amount every time the stepper motor dispenses the pill.                                    |  Met        | Decrement logic on stepper task; MQTT alert sent. Verified on Node-RED          |
+| SRS 04   | A schedule shall be set by the provider to send reminders for taking pills.                                                     | Partially Met        | Practitioner can set schedule on Node-RED dashboard. Future scope to integrate it with the hardware.                       |
+| SRS 05   | An MQTT broker shall communicate with Node-RED for sending alerts                                              |  Met        | Verified with payloads on "pill/alert" and "pill/status" topics.                |
+| SRS 06   | Node-RED UI dashboard shall displays pill count, status, and connectivity                      |  Met        | Dashboard fields update on MQTT publish from MCU.                                |                                       
+| SRS 07   | A FreeRTOS task shall read temperature data every 10 seconds and publish it via MQTT     |  Met        | Temperature task uses vTaskDelay(10000/portTICK_PERIOD_MS). MQTT publish verified on topic "pill/temp". Reading accuracy validated by comparing with ambient temperature. |
+| SRS 08   | The system shall run all tasks (dispense, sensor, comms, alerts) concurrently under FreeRTOS |  Partially Met | Tasks are created and run under FreeRTOS. Validation via serial logs and functional testing. However, system occasionally freezes or stops responding, indicating potential stack/heap mismanagement or race condition. Debugging ongoing. |
+
+
 
 ## 4. Project Photos & Screenshots
 
+![Dispenser](Pill_Dispenser.jpg)
+
+![Setup](IMG_5966.jpg)
+
+![PCB Top Pic](IMG_5814.jpg)
+
+![PCB Top Pic](IMG_5976.jpg)
+
+![Thermal Camera](Point5.jpeg)
+
+![2D Image](2DImage.png)
+
+![3D Image](3DImage.png)
+
+![Node Red Flow](NodeRedFlow.png)
+
+![Dashboard](Dashboard.png)
+
+![Block Diagram](TaskBlockDiagram.drawio.png)
+
+
 ## Codebase
 
-- A link to your final embedded C firmware codebases
-- A link to your Node-RED dashboard code
+- A link to your final embedded C firmware codebases: Github
+- A link to your Node-RED dashboard code: 
 - Links to any other software required for the functionality of your device
-
